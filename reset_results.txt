@@ -1,0 +1,24 @@
+Safe password-reset walkthrough (mock service, test account only)
+
+=== A. Weak (knowledge-based questions only) ===
+ request_reset -> If the account exists, a reset message was sent.
+ enumeration probe -> No such account. (LEAKS account existence)
+ identity check with PUBLIC info only -> OK
+ outcome -> ACCOUNT TAKEN OVER | alerts to owner: none
+
+=== B. Partial (rate limit + notification) ===
+ request_reset -> If the account exists, a reset message was sent.
+ enumeration probe -> If the account exists, a reset message was sent. (consistent)
+ identity check with PUBLIC info only -> OK
+ outcome -> ACCOUNT TAKEN OVER | alerts to owner: ['Your password was changed.']
+
+=== C. Hardened (OWASP-aligned: owner confirmation, cooling-off, alerts) ===
+ request_reset -> If the account exists, a reset message was sent.
+ enumeration probe -> If the account exists, a reset message was sent. (consistent)
+ identity check with PUBLIC info only -> BLOCKED: waiting for owner confirmation (alert sent)
+ outcome -> ATTACK STOPPED | alerts to owner: ['Reset requested - was this you?']
+
+=== Summary ===
+ ACCOUNT TAKEN OVER   A. Weak (knowledge-based questions only)
+ ACCOUNT TAKEN OVER   B. Partial (rate limit + notification)
+ ATTACK STOPPED       C. Hardened (OWASP-aligned: owner confirmation, cooling-off, alerts)
